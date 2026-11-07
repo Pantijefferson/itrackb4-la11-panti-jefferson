@@ -66,7 +66,7 @@
     </div>
 
     <!-- Comics Table -->
-    <table class="table table-striped table-bordered">
+    <table class="table table-striped table-bordered align-middle">
         <thead>
             <tr>
                 <th>Title</th>
@@ -74,6 +74,7 @@
                 <th>Year</th>
                 <th>Genre</th>
                 <th>Price</th>
+                <th style="width: 150px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -87,22 +88,37 @@
                     <td>{{ $comic->author }}</td>
                     <td>{{ $comic->year }}</td>
                     <td>
-                        <!-- Part E: Reading across the relationship to show the related genre name -->
                         <a href="{{ route('comics.index', ['genre_id' => $comic->genre_id, 'year' => $year]) }}">
                             {{ $comic->genre->name }}
                         </a>
                     </td>
                     <td>${{ number_format($comic->price, 2) }}</td>
+                    
+                    <!-- ACTIONS COLUMN WITH EDIT BUTTON & DELETE FORM -->
+                    <td>
+                        <div class="d-flex gap-1">
+                            <!-- Edit Button -->
+                            <a href="{{ route('comics.edit', $comic) }}" class="btn btn-warning btn-sm">Edit</a>
+
+                            <!-- Delete Form (Part E) -->
+                            <form action="{{ route('comics.destroy', $comic) }}" method="POST" 
+                                  onsubmit="return confirm('Delete this record?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center">No Comics Available</td>
+                    <td colspan="6" class="text-center">No Comics Available</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-    <!-- Part F Requirement: Temporary Query Counter (Remember to remove for final submission step F5) -->
+    <!-- Part F Requirement: Temporary Query Counter -->
     <p>Queries: {{ count(\Illuminate\Support\Facades\DB::getQueryLog()) }}</p>
 
 @endsection

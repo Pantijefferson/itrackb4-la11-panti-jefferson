@@ -11,7 +11,7 @@ class ComicController extends Controller
 {
     public function index(Request $request)
     {
-        // Part F: Enable query log
+        
         DB::enableQueryLog();
 
         $genres = Genre::all();      
@@ -19,7 +19,7 @@ class ComicController extends Controller
         $genreId = $request->query('genre_id');
         $year = $request->query('year');
 
-        // WALANG with('genre') muna para tumaas ang query count (Screenshot 6)
+        
         $query = Comic::query();
 
         if ($genreId && $genreId !== 'all') {
@@ -42,7 +42,7 @@ class ComicController extends Controller
 
     public function create()
     {
-        // Part E Requirement: Pass lookup rows to the create view for the dropdown
+        
         $genres = Genre::all();
         
         return view('comics.create', compact('genres'));
@@ -50,19 +50,19 @@ class ComicController extends Controller
 
     public function store(Request $request)
     {
-        // Part A & E Requirements: Validation rules with keys matching columns exactly
+        
         $validated = $request->validate([
             'title'       => 'required|max:100',
             'author'      => 'required|max:100',
             'year'        => 'required|digits:4|integer|min:1000|max:' . date('Y'),
             'price'       => 'required|numeric|min:0',
-            'genre_id'    => 'required|exists:genres,id', // Part E: exists rule against lookup table
+            'genre_id'    => 'required|exists:genres,id', 
             'is_featured' => 'sometimes|boolean',
         ]);
 
         $validated['is_featured'] = $request->boolean('is_featured');
 
-        // Part A Requirement: Save using create() with the validated array
+        
         Comic::create($validated);
 
         return redirect()
@@ -70,28 +70,37 @@ class ComicController extends Controller
             ->with('success', 'Comic added successfully.');
     }
 
-    public function show(string $id)
-    {
-        $comic = Comic::findOrFail($id);
+    public function show(Comic $comic)
+{
+    return view('comics.show', ['comic' => $comic]);
+}
 
-        return view('comics.show', ['comic' => $comic]);
-    }
+    public function edit(Comic $comic)
+{
+    $genres = Genre::all(); 
+    return view('comics.edit', compact('comic', 'genres'));
+}
 
-    public function edit(string $id)
-    {
-        //
-    }
+    public function update(Request $request, Comic $comic)
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'author' => 'required|string|max:255',
+        'genre_id' => 'required|exists:genres,id',
+    ]);
 
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    $comic->update($validated);
 
-    public function destroy(string $id)
-    {
-        //
-    }
+    
+    return redirect()->route('comics.index')->with('success', 'Comic updated successfully!');
+}
 
+    public function destroy(Comic $comic)
+{
+    $comic->delete();
+
+    return redirect()->route('comics.index');
+}
     public function feature()
     {
         $comic = Comic::where('is_featured', true)->first();

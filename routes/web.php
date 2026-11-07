@@ -27,9 +27,4 @@ Route::get('/comics/filter/{value?}', function ($value = null) {
 })->name('comics.filter');
 
 
-Route::resource('comics', ComicController::class)->only([
-    'index',
-    'show',
-    'create',
-    'store',
-]);
+Route::resource('comics', ComicController::class);
